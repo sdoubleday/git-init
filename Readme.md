@@ -1,0 +1,1 @@
+Simple init and config script for git repositories. git-init.Tests.ps1 requires Pester.
