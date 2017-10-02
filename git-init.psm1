@@ -58,6 +58,36 @@ gitignore*.*
     git commit -m "gitignore created and committed"
 #endregion commit .gitignore
 
+#region commit bootstrap, setup, and update    
+$bootstrap = @'
+Write-verbose -verbose "Bootstrapping missing submodules..."
+git submodule update --init --recursive
+
+'@
+$setup = @'
+write-verbose "Setup..." -Verbose
+write-verbose "Running bootstrap..." -Verbose
+. .\bootstrap.ps1
+
+'@
+$update = @'
+PARAM([Switch]$Force)
+If(-not $Force.IsPresent) {Write-verbose -verbose "Update cancelled. Run update.ps1 -force to update submodules."}
+Write-verbose -verbose "update.ps1 fetches the current commits of the submodules. THIS MAY BREAK THE MODULE and constitutes a change as far as git is concerned."
+If($Force.IsPresent) {Write-verbose -verbose "Updating submodules..."
+git submodule update --recursive --remote }
+
+'@
+    New-Item -ItemType File -Name 'bootstrap.ps1' -Value $bootstrap
+    New-Item -ItemType File -Name 'setup.ps1' -Value $setup
+    New-Item -ItemType File -Name 'update.ps1' -Value $update
+    git add bootstrap.ps1
+    git add setup.ps1
+    git add update.ps1
+    git commit -m "bootstrap, setup, and update created and committed"
+#endregion commit bootstrap, setup, and update    
+
+
 
 }<#End git-init#>
 

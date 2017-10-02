@@ -79,4 +79,39 @@ gitignore*.*
         get-childitem .gitignore | get-content | Out-String | Should Be $output
     }
 
-}
+    It "bootstrap.ps1 is created with my typical contents." {
+        git-init -userEmail 'test@gmail.com' -userName 'test'
+        $output = @'
+Write-verbose -verbose "Bootstrapping missing submodules..."
+git submodule update --init --recursive
+
+'@
+        get-childitem bootstrap.ps1 | get-content | Out-String | Should Be $output
+    }
+
+    It "setup.ps1 is created with my typical contents." {
+        git-init -userEmail 'test@gmail.com' -userName 'test'
+        $output = @'
+write-verbose "Setup..." -Verbose
+write-verbose "Running bootstrap..." -Verbose
+. .\bootstrap.ps1
+
+'@
+        get-childitem setup.ps1 | get-content | Out-String | Should Be $output
+    }
+
+    It "update.ps1 is created with my typical contents." {
+        git-init -userEmail 'test@gmail.com' -userName 'test'
+        $output = @'
+PARAM([Switch]$Force)
+If(-not $Force.IsPresent) {Write-verbose -verbose "Update cancelled. Run update.ps1 -force to update submodules."}
+Write-verbose -verbose "update.ps1 fetches the current commits of the submodules. THIS MAY BREAK THE MODULE and constitutes a change as far as git is concerned."
+If($Force.IsPresent) {Write-verbose -verbose "Updating submodules..."
+git submodule update --recursive --remote }
+
+'@
+        get-childitem update.ps1 | get-content | Out-String | Should Be $output
+    }
+
+
+}<#END Describe "git-init"#>
